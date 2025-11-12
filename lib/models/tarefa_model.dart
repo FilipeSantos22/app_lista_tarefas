@@ -1,6 +1,6 @@
 class Tarefa {
-  final String id;
-  final String idUsuario;
+  final int id;
+  final int idUsuario;
   final String titulo;
   bool concluida;
 
@@ -13,8 +13,8 @@ class Tarefa {
 
   factory Tarefa.fromJson(Map<String, dynamic> json) {
     return Tarefa(
-      id: json['id'] as String,
-      idUsuario: json['userId'] as String,
+      id: json['id'] as int,
+      idUsuario: json['userId'] as int,
       titulo: json['title'] as String,
       concluida: json['completed'] as bool? ?? false,
     );

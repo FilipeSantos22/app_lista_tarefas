@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controllers/tarefa_controller.dart';
-import '../models/tarefa_model.dart';
+import '../widgets/widgets.dart';
 
 class TelaTarefas extends StatefulWidget {
   const TelaTarefas({super.key});
@@ -16,10 +16,15 @@ class _TelaTarefasState extends State<TelaTarefas> {
   @override
   void initState() {
     super.initState();
-    // Carrega as tarefas ao iniciar a tela
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<TarefaController>(context, listen: false).carregarTarefas();
     });
+  }
+
+  @override
+  void dispose() {
+    _controllerTitulo.dispose();
+    super.dispose();
   }
 
   @override
@@ -30,75 +35,52 @@ class _TelaTarefasState extends State<TelaTarefas> {
       appBar: AppBar(
         title: const Text('Lista de Tarefas 🧩'),
         centerTitle: true,
+        actions: [
+          if (controlador.usandoCache) const BadgeOffline(),
+        ],
       ),
       body: Column(
         children: [
-          // Campo para adicionar nova tarefa
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controllerTitulo,
-                    decoration: const InputDecoration(
-                      labelText: 'Nova tarefa',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    controlador.adicionarTarefa(_controllerTitulo.text);
-                    _controllerTitulo.clear();
-                  },
-                  child: const Text('Adicionar'),
-                ),
-              ],
+          if (controlador.erro != null)
+            BannerErro(
+              mensagem: controlador.erro!,
+              onFechar: () => controlador.carregarTarefas(),
             ),
+
+          InputNovaTarefa(
+            controller: _controllerTitulo,
+            onAdicionar: () {
+              controlador.adicionarTarefa(_controllerTitulo.text);
+              _controllerTitulo.clear();
+            },
           ),
 
-          // Lista de tarefas
           Expanded(
-            child: controlador.tarefas.isEmpty
+            child: controlador.isLoading
                 ? const Center(
-                    child: Text(
-                      'Nenhuma tarefa adicionada ainda!',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    child: CircularProgressIndicator(),
                   )
-                : ListView.builder(
-                    itemCount: controlador.tarefas.length,
-                    itemBuilder: (context, index) {
-                      final tarefa = controlador.tarefas[index];
-                      return Dismissible(
-                        key: Key(tarefa.id),
-                        background: Container(color: Colors.red),
-                        onDismissed: (_) =>
-                            controlador.removerTarefa(tarefa.id),
-                        child: ListTile(
-                          title: Text(
-                            tarefa.titulo,
-                            style: TextStyle(
-                              decoration: tarefa.concluida
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                            ),
-                          ),
-                          trailing: Icon(
-                            tarefa.concluida
-                                ? Icons.check_circle
-                                : Icons.circle_outlined,
-                            color:
-                                tarefa.concluida ? Colors.green : Colors.grey,
-                          ),
-                          onTap: () =>
-                              controlador.alternarConclusao(tarefa.id),
+                : controlador.tarefas.isEmpty
+                    ? EstadoVazio(
+                        mostrarBotaoReconectar: controlador.usandoCache,
+                        onReconectar: () => controlador.atualizarDaApi(),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: () => controlador.atualizarDaApi(),
+                        child: ListView.builder(
+                          itemCount: controlador.tarefas.length,
+                          itemBuilder: (context, index) {
+                            final tarefa = controlador.tarefas[index];
+                            return TarefaItem(
+                              tarefa: tarefa,
+                              onAlternarConclusao: () =>
+                                  controlador.alternarConclusao(tarefa.id),
+                              onRemover: () =>
+                                  controlador.removerTarefa(tarefa.id),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
+                      ),
           ),
         ],
       ),
