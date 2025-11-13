@@ -1,4 +1,4 @@
-# App Lista de Tarefas
+# App Flutter para Lista de Tarefas - Gestão Online
 
 Aplicativo Flutter de gerenciamento de tarefas desenvolvido como teste técnico para vaga de desenvolvedor júnior. O app consome a API fake [JSONPlaceholder](https://jsonplaceholder.typicode.com/) para demonstrar CRUD completo com integração backend, cache local e funcionalidade offline.
 
