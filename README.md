@@ -11,7 +11,6 @@ Aplicativo Flutter de gerenciamento de tarefas desenvolvido como teste técnico 
 - ✅ **Marcar como concluída** ao clicar na tarefa
 - ✅ **Remover tarefa** via swipe-to-delete ou botão X
 - ✅ **Cache local** com SharedPreferences (modo offline)
-- ✅ **Loading states** e feedback visual
 - ✅ **Tratamento de erros** com mensagens específicas
 - ✅ **Optimistic updates** para melhor UX
 

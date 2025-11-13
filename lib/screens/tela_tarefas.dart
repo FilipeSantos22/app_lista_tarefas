@@ -56,16 +56,12 @@ class _TelaTarefasState extends State<TelaTarefas> {
           ),
 
           Expanded(
-            child: controlador.isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(),
+            child: controlador.tarefas.isEmpty
+                ? EstadoVazio(
+                    mostrarBotaoReconectar: controlador.usandoCache,
+                    onReconectar: () => controlador.atualizarDaApi(),
                   )
-                : controlador.tarefas.isEmpty
-                    ? EstadoVazio(
-                        mostrarBotaoReconectar: controlador.usandoCache,
-                        onReconectar: () => controlador.atualizarDaApi(),
-                      )
-                    : RefreshIndicator(
+                : RefreshIndicator(
                         onRefresh: () => controlador.atualizarDaApi(),
                         child: ListView.builder(
                           itemCount: controlador.tarefas.length,

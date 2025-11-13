@@ -8,19 +8,12 @@ class TarefaController extends ChangeNotifier {
   final ApiService _apiService = ApiService();
   
   List<Tarefa> _tarefas = [];
-  bool _isLoading = false;
   String? _erro;
   bool _usandoCache = false;
 
   List<Tarefa> get tarefas => _tarefas;
-  bool get isLoading => _isLoading;
   String? get erro => _erro;
   bool get usandoCache => _usandoCache;
-
-  void _setLoading(bool value) {
-    _isLoading = value;
-    notifyListeners();
-  }
 
   void _setErro(String? mensagem) {
     _erro = mensagem;
@@ -28,7 +21,6 @@ class TarefaController extends ChangeNotifier {
   }
 
   Future<void> carregarTarefas() async {
-    _setLoading(true);
     _setErro(null);
     
     try {
@@ -37,6 +29,7 @@ class TarefaController extends ChangeNotifier {
       _usandoCache = false;
       
       await _armazenamento.salvarTarefas(_tarefas);
+      notifyListeners();
       
     } on ApiException catch (e) {
       if (e.isConnectionError) {
@@ -47,13 +40,13 @@ class TarefaController extends ChangeNotifier {
       
       _tarefas = await _armazenamento.carregarTarefas();
       _usandoCache = true;
+      notifyListeners();
       
     } catch (e) {
       _setErro('Erro ao carregar tarefas: $e');
       _tarefas = await _armazenamento.carregarTarefas();
       _usandoCache = true;
-    } finally {
-      _setLoading(false);
+      notifyListeners();
     }
   }
 
@@ -177,7 +170,6 @@ class TarefaController extends ChangeNotifier {
   }
 
   Future<void> atualizarDaApi() async {
-    _setLoading(true);
     _setErro(null);
     
     try {
@@ -186,6 +178,7 @@ class TarefaController extends ChangeNotifier {
       _usandoCache = false;
       
       await _armazenamento.salvarTarefas(_tarefas);
+      notifyListeners();
       
     } on ApiException catch (e) {
       if (e.isConnectionError) {
@@ -195,8 +188,6 @@ class TarefaController extends ChangeNotifier {
       }
     } catch (e) {
       _setErro('Erro inesperado: $e');
-    } finally {
-      _setLoading(false);
     }
   }
 }

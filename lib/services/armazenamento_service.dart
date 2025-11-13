@@ -14,7 +14,11 @@ class ArmazenamentoService {
   Future<List<Tarefa>> carregarTarefas() async {
     final prefs = await SharedPreferences.getInstance();
     final dados = prefs.getString(_chaveTarefas);
-    if (dados == null) return [];
+
+    if (dados == null) { 
+      return [];
+    }
+
     final lista = jsonDecode(dados) as List;
     return lista.map((item) => Tarefa.fromJson(item)).toList();
   }
